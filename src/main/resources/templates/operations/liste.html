@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::title}, ~{::section})}">
+<head><title>Opérations</title></head>
+<body>
+<section>
+
+    <div style="margin-bottom:24px;">
+        <div class="breadcrumb">
+            <a th:href="@{/clients}">Clients</a>
+            <i class="fas fa-chevron-right"></i>
+            <a th:href="@{/comptes/client/{id}(id=${client.id})}" th:text="${client.nomComplet}">Client</a>
+            <i class="fas fa-chevron-right"></i>
+            <span th:text="${compte.numeroCompte}">CPT</span>
+        </div>
+        <div class="page-header" style="margin-bottom:0;">
+            <div class="page-header-left">
+                <h1><em th:text="${compte.numeroCompte}">N°</em></h1>
+                <p class="page-header-sub">
+                    <span th:text="${compte.typeCompte == 'COURANT'} ? 'Compte Courant' : 'Compte Épargne'">Type</span>
+                    &nbsp;·&nbsp;
+                    <span th:text="${client.nomComplet}">Client</span>
+                </p>
+            </div>
+            <!-- PDF BUTTON - prominent -->
+            <a th:href="@{/operations/releve/{num}(num=${compte.numeroCompte})}"
+               class="btn btn-teal"
+               style="font-size:14px;padding:11px 22px;">
+                <i class="fas fa-file-pdf"></i> Télécharger le Relevé PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon indigo"><i class="fas fa-wallet"></i></div>
+            <div class="kpi-value"
+                 th:text="${#numbers.formatDecimal(compte.solde, 1, 'COMMA', 2, 'POINT')}">0,00</div>
+            <div class="kpi-label">Solde actuel (MAD)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon emerald"><i class="fas fa-arrow-trend-up"></i></div>
+            <div class="kpi-value"
+                 th:text="${#numbers.formatDecimal(totalDepots, 1, 'COMMA', 2, 'POINT')}">0,00</div>
+            <div class="kpi-label">Total Dépôts (MAD)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon rose"><i class="fas fa-arrow-trend-down"></i></div>
+            <div class="kpi-value"
+                 th:text="${#numbers.formatDecimal(totalRetraits, 1, 'COMMA', 2, 'POINT')}">0,00</div>
+            <div class="kpi-label">Total Retraits (MAD)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon teal"><i class="fas fa-list-ol"></i></div>
+            <div class="kpi-value" th:text="${operations.size()}">0</div>
+            <div class="kpi-label">Nb Opérations</div>
+        </div>
+    </div>
+
+    <!-- DEPOT / RETRAIT -->
+    <div class="op-panels">
+        <div class="op-panel depot">
+            <div class="op-panel-head">
+                <div class="panel-icon"><i class="fas fa-plus"></i></div>
+                <span class="op-panel-title">Effectuer un Dépôt</span>
+            </div>
+            <div class="op-panel-body">
+                <form th:action="@{/operations/depot}" method="post">
+                    <input type="hidden" name="numeroCompte" th:value="${compte.numeroCompte}"/>
+                    <div class="form-group" style="margin-bottom:13px;">
+                        <label class="form-label">Montant (MAD) *</label>
+                        <input type="number" name="montant" class="form-control"
+                               placeholder="Ex : 500,00" min="1" step="0.01" required
+                               style="border-color:var(--em-md);"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom:18px;">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-control"
+                               placeholder="Ex : Versement salaire"
+                               style="border-color:var(--em-md);"/>
+                    </div>
+                    <button type="submit" class="btn-submit-depot">
+                        <i class="fas fa-circle-check"></i> Confirmer le dépôt
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="op-panel retrait">
+            <div class="op-panel-head">
+                <div class="panel-icon"><i class="fas fa-minus"></i></div>
+                <span class="op-panel-title">Effectuer un Retrait</span>
+            </div>
+            <div class="op-panel-body">
+                <form th:action="@{/operations/retrait}" method="post">
+                    <input type="hidden" name="numeroCompte" th:value="${compte.numeroCompte}"/>
+                    <div class="form-group" style="margin-bottom:13px;">
+                        <label class="form-label">Montant (MAD) *</label>
+                        <input type="number" name="montant" class="form-control"
+                               placeholder="Ex : 200,00" min="1" step="0.01" required
+                               style="border-color:var(--rose-md);"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom:18px;">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-control"
+                               placeholder="Ex : Retrait DAB"
+                               style="border-color:var(--rose-md);"/>
+                    </div>
+                    <button type="submit" class="btn-submit-retrait">
+                        <i class="fas fa-circle-check"></i> Confirmer le retrait
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="card">
+        <div class="card-head">
+            <span class="card-title">Historique des Opérations</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="badge badge-slate"
+                      th:text="${operations.size()} + ' opération(s)'">0</span>
+                <!-- PDF SHORTCUT in table header -->
+                <a th:href="@{/operations/releve/{num}(num=${compte.numeroCompte})}"
+                   class="btn btn-teal btn-sm">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
+            </div>
+        </div>
+        <div class="tbl-wrap">
+            <div th:if="${operations.isEmpty()}" class="empty-state">
+                <i class="fas fa-arrows-rotate empty-state-icon"></i>
+                <h3>Aucune opération</h3>
+                <p>Les transactions apparaîtront ici après le premier dépôt ou retrait.</p>
+            </div>
+            <table th:unless="${operations.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Date &amp; Heure</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th style="text-align:right;">Montant (MAD)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="op : ${operations}">
+                    <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-3);"
+                        th:text="${#temporals.format(op.dateOperation, 'dd/MM/yyyy HH:mm')}">—</td>
+                    <td>
+                        <span th:class="${op.type.name() == 'DEPOT'} ? 'badge badge-emerald' : 'badge badge-rose'">
+                            <i th:class="${op.type.name() == 'DEPOT'} ? 'fas fa-arrow-down' : 'fas fa-arrow-up'"></i>
+                            <span th:text="${op.type.libelle}">Type</span>
+                        </span>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;"
+                        th:text="${op.description != null ? op.description : '—'}">—</td>
+                    <td style="text-align:right;">
+                        <span th:class="${op.type.name() == 'DEPOT'} ? 'amount-depot' : 'amount-retrait'"
+                              th:text="${op.type.name() == 'DEPOT'} ? '+ ' + ${#numbers.formatDecimal(op.montant, 1, 'COMMA', 2, 'POINT')} : '− ' + ${#numbers.formatDecimal(op.montant, 1, 'COMMA', 2, 'POINT')}">0,00</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::title}, ~{::section})}">
+<head><title th:text="${client.id != null} ? 'Modifier Client' : 'Nouveau Client'">Client</title></head>
+<body>
+<section>
+
+    <div style="margin-bottom:26px;">
+        <a th:href="@{/clients}" class="breadcrumb">
+            <i class="fas fa-chevron-left"></i>
+            <span>Retour à la liste</span>
+        </a>
+        <div class="page-header" style="margin-bottom:0;">
+            <div class="page-header-left">
+                <h1 th:if="${client.id == null}">Nouveau <em>Client</em></h1>
+                <h1 th:if="${client.id != null}">Modifier le <em>Client</em></h1>
+                <p class="page-header-sub"
+                   th:text="${client.id != null} ? 'Mise à jour des informations de ' + client.nomComplet : 'Remplissez les informations du client'">
+                    Remplissez les informations
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:780px;">
+        <div class="card-head">
+            <span class="card-title">
+                <i class="fas fa-user" style="color:var(--indigo);margin-right:9px;"></i>
+                Informations personnelles
+            </span>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/clients/sauvegarder}" th:object="${client}" method="post">
+                <!-- Hidden id for edit mode -->
+                <input type="hidden" th:field="*{id}"/>
+
+                <div class="form-section">
+                    <div class="form-section-title">Identité</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Prénom *</label>
+                            <input type="text" th:field="*{prenom}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('prenom')} ? ' is-invalid' : ''"
+                                   placeholder="Ex : Youssef"/>
+                            <span th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}" class="field-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" th:field="*{nom}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('nom')} ? ' is-invalid' : ''"
+                                   placeholder="Ex : El Mansouri"/>
+                            <span th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="field-error"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Contact</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Adresse email *</label>
+                            <input type="email" th:field="*{email}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('email')} ? ' is-invalid' : ''"
+                                   placeholder="exemple@gmail.com"/>
+                            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Téléphone</label>
+                            <input type="text" th:field="*{telephone}" class="form-control"
+                                   placeholder="+212 6XX XXX XXX"/>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label class="form-label">Adresse postale</label>
+                            <input type="text" th:field="*{adresse}" class="form-control"
+                                   placeholder="Rue, Ville, Pays"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div style="display:flex;gap:10px;justify-content:flex-end;">
+                    <a th:href="@{/clients}" class="btn btn-ghost">
+                        <i class="fas fa-xmark"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-indigo">
+                        <i class="fas fa-floppy-disk"></i>
+                        <span th:text="${client.id != null} ? 'Enregistrer les modifications' : 'Créer le client'">Enregistrer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

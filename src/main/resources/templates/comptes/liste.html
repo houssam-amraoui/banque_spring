@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::title}, ~{::section})}">
+<head><title>Comptes</title></head>
+<body>
+<section>
+
+    <div style="margin-bottom:24px;">
+        <a th:href="@{/clients}" class="breadcrumb">
+            <i class="fas fa-chevron-left"></i>
+            <span>Tous les clients</span>
+        </a>
+        <div class="page-header" style="margin-bottom:0;">
+            <div class="page-header-left" style="display:flex;align-items:center;gap:14px;">
+                <div class="avatar" style="width:52px;height:52px;font-size:17px;border-radius:13px;"
+                     th:text="${#strings.substring(client.prenom,0,1) + #strings.substring(client.nom,0,1)}">AB</div>
+                <div>
+                    <h1 th:text="${client.nomComplet}">Nom Client</h1>
+                    <p class="page-header-sub" th:text="${client.email}">email@client.com</p>
+                </div>
+            </div>
+            <div style="display:flex;gap:9px;">
+                <a th:href="@{/clients/modifier/{id}(id=${client.id})}" class="btn btn-amber">
+                    <i class="fas fa-pen"></i> Modifier
+                </a>
+                <a th:href="@{/clients}" class="btn btn-ghost">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+                <a th:href="@{/comptes/nouveau/{id}(id=${client.id})}" class="btn btn-indigo">
+                    <i class="fas fa-plus"></i> Nouveau Compte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-grid" th:if="${!comptes.isEmpty()}">
+        <div class="kpi-card">
+            <div class="kpi-icon indigo"><i class="fas fa-landmark"></i></div>
+            <div class="kpi-value" th:text="${comptes.size()}">0</div>
+            <div class="kpi-label">Comptes ouverts</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon teal"><i class="fas fa-coins"></i></div>
+            <div class="kpi-value"
+                 th:text="${#numbers.formatDecimal(soldeTotal, 1, 'COMMA', 2, 'POINT')} + ' MAD'">0 MAD</div>
+            <div class="kpi-label">Solde total</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon emerald"><i class="fas fa-arrows-rotate"></i></div>
+            <div class="kpi-value" th:text="${totalOperations}">0</div>
+            <div class="kpi-label">Total opérations</div>
+        </div>
+    </div>
+
+    <div class="card" th:if="${comptes.isEmpty()}">
+        <div class="empty-state">
+            <i class="fas fa-landmark empty-state-icon"></i>
+            <h3>Aucun compte bancaire</h3>
+            <p>Ce client n'a pas encore de compte. Créez-en un maintenant.</p>
+            <a th:href="@{/comptes/nouveau/{id}(id=${client.id})}" class="btn btn-indigo" style="margin-top:18px;">
+                <i class="fas fa-plus"></i> Créer un compte
+            </a>
+        </div>
+    </div>
+
+    <div class="compte-grid" th:unless="${comptes.isEmpty()}">
+        <div th:each="compte : ${comptes}" class="compte-card">
+            <div th:class="${compte.typeCompte == 'COURANT'} ? 'cch-courant' : 'cch-epargne'">
+                <div class="cchip">
+                    <i th:class="${compte.typeCompte == 'COURANT'} ? 'fas fa-credit-card' : 'fas fa-piggy-bank'"></i>
+                </div>
+                <div class="ctl" th:text="${compte.typeCompte == 'COURANT'} ? 'Compte Courant' : 'Compte Épargne'">Type</div>
+                <div class="cnum" th:text="${compte.numeroCompte}">CPT-XXXX</div>
+                <div class="csl">Solde disponible</div>
+                <div>
+                    <span class="csol" th:text="${#numbers.formatDecimal(compte.solde, 1, 'COMMA', 2, 'POINT')}">0,00</span>
+                    <span class="cdev">MAD</span>
+                </div>
+            </div>
+            <div class="compte-card-body">
+                <div>
+                    <div class="cil">Date d'ouverture</div>
+                    <div class="civ" th:text="${compte.dateCreation != null ? #temporals.format(compte.dateCreation, 'dd/MM/yyyy') : '—'}">—</div>
+                </div>
+                <div>
+                    <div class="cil" th:text="${compte.typeCompte == 'COURANT'} ? 'Découvert autorisé' : 'Taux d\'intérêt'">Info</div>
+                    <div class="civ" th:text="${compte.infosSpecifiques}">—</div>
+                </div>
+            </div>
+            <div class="compte-card-footer">
+                <a th:href="@{/operations/compte/{num}(num=${compte.numeroCompte})}"
+                   class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;">
+                    <i class="fas fa-list"></i> Opérations
+                </a>
+                <a th:href="@{/operations/releve/{num}(num=${compte.numeroCompte})}"
+                   class="btn btn-teal btn-sm" style="flex:1;justify-content:center;">
+                    <i class="fas fa-file-pdf"></i> Relevé PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
