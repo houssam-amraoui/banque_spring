@@ -19,6 +19,9 @@ public class BanqueApplication {
     @Bean
     CommandLineRunner initData(BanqueService service) {
         return args -> {
+            if (!service.getAllClients().isEmpty()) {
+                return;
+            }
             // Clients
             Client c1 = service.saveClient(Client.builder()
                     .nom("ALAOUI").prenom("Mohammed")
