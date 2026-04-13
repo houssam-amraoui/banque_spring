@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="page(title, content)">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title} + ' · Ilyas Banque'">Ilyas Banque</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/banque.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 21H21M3 10H21M5 6L12 3L19 6M4 10V21M20 10V21M8 14V17M12 14V17M16 14V17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div>
+            <span class="logo-name">Ilyas Banque</span>
+            <span class="logo-sub">Système de gestion bancaire</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <span class="nav-label">Menu principal</span>
+        <a th:href="@{/clients}" class="nav-link"
+           th:classappend="${activeNav == 'clients'} ? ' active' : ''">
+            <span class="nav-icon"><i class="fas fa-users"></i></span>
+            <span>Clients</span>
+        </a>
+        <span class="nav-label">Comptes &amp; Opérations</span>
+        <a th:href="@{/clients}" class="nav-link"
+           th:classappend="${activeNav == 'comptes'} ? ' active' : ''">
+            <span class="nav-icon"><i class="fas fa-landmark"></i></span>
+            <span>Comptes</span>
+        </a>
+        <a th:href="@{/clients}" class="nav-link"
+           th:classappend="${activeNav == 'operations'} ? ' active' : ''">
+            <span class="nav-icon"><i class="fas fa-arrows-rotate"></i></span>
+            <span>Opérations</span>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <div class="status-dot"></div>
+        <span>Système opérationnel</span>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <header class="topbar">
+        <h1 class="topbar-title" th:text="${title}">Page</h1>
+        <div class="topbar-right">
+            <div class="topbar-time" id="clock">--:--</div>
+            <div class="admin-chip">
+                <i class="fas fa-circle-user"></i>
+                <span>Admin</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <div th:if="${successMsg}" class="toast toast-success">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMsg}"></span>
+        </div>
+        <div th:if="${errorMsg}" class="toast toast-error">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span th:text="${errorMsg}"></span>
+        </div>
+        <div th:replace="${content}">Content</div>
+    </main>
+</div>
+
+<script>
+    function tick() {
+        const now = new Date();
+        document.getElementById('clock').textContent =
+            now.toLocaleTimeString('fr-MA', {hour:'2-digit', minute:'2-digit'});
+    }
+    tick(); setInterval(tick, 1000);
+    document.querySelectorAll('.toast').forEach(t => {
+        setTimeout(() => t.style.opacity = '0', 4000);
+        setTimeout(() => t.remove(), 4500);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(~{::title}, ~{::section})}">
+<head><title>Nouveau Compte</title></head>
+<body>
+<section>
+
+    <div style="margin-bottom:26px;">
+        <a th:href="@{/comptes/client/{id}(id=${clientId})}" class="breadcrumb">
+            <i class="fas fa-chevron-left"></i>
+            <span th:text="${client.nomComplet}">Client</span>
+        </a>
+        <div class="page-header" style="margin-bottom:0;">
+            <div class="page-header-left">
+                <h1>Nouveau <em>Compte</em></h1>
+                <p class="page-header-sub">Pour :
+                    <strong th:text="${client.nomComplet}" style="color:var(--indigo);">Client</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:640px;">
+        <div class="card-head">
+            <span class="card-title">
+                <i class="fas fa-landmark" style="color:var(--indigo);margin-right:9px;"></i>
+                Paramètres du compte
+            </span>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/comptes/sauvegarder/{clientId}(clientId=${clientId})}" method="post">
+
+                <div class="form-section">
+                    <div class="form-section-title">Type de compte</div>
+                    <div class="type-selector">
+                        <div>
+                            <input type="radio" name="typeCompte" value="COURANT" id="rc" class="type-radio"
+                                   onchange="toggleFields(this.value)" checked/>
+                            <label for="rc" class="type-label">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Compte Courant</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="typeCompte" value="EPARGNE" id="re" class="type-radio"
+                                   onchange="toggleFields(this.value)"/>
+                            <label for="re" class="type-label">
+                                <i class="fas fa-piggy-bank"></i>
+                                <span>Compte Épargne</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Solde initial</div>
+                    <div class="form-group">
+                        <label class="form-label">Montant (MAD) *</label>
+                        <input type="number" name="soldeInitial" class="form-control"
+                               placeholder="Ex : 1000.00" min="0" step="0.01" required/>
+                    </div>
+                </div>
+
+                <div class="form-section type-fields show" id="fields-courant">
+                    <div class="form-section-title">Options Compte Courant</div>
+                    <div class="form-group">
+                        <label class="form-label">Découvert autorisé (MAD)</label>
+                        <input type="number" name="decouvert" class="form-control"
+                               placeholder="Ex : 500.00" min="0" step="0.01"/>
+                    </div>
+                </div>
+
+                <div class="form-section type-fields" id="fields-epargne">
+                    <div class="form-section-title">Options Compte Épargne</div>
+                    <div class="form-group">
+                        <label class="form-label">Taux d'intérêt (%)</label>
+                        <input type="number" name="taux" class="form-control"
+                               placeholder="Ex : 3.5" min="0" step="0.01"/>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div style="display:flex;gap:10px;justify-content:flex-end;">
+                    <a th:href="@{/comptes/client/{id}(id=${clientId})}" class="btn btn-ghost">
+                        <i class="fas fa-xmark"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-indigo">
+                        <i class="fas fa-plus"></i> Créer le compte
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleFields(type) {
+            document.getElementById('fields-courant').classList.toggle('show', type === 'COURANT');
+            document.getElementById('fields-epargne').classList.toggle('show', type === 'EPARGNE');
+        }
+    </script>
+
+</section>
+</body>
+</html>
